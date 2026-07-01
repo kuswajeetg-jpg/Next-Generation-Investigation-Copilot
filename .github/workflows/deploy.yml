@@ -1,0 +1,51 @@
+name: Deploy Flutter Web to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Initialize Web Platform
+        run: |
+          cd frontend
+          flutter create --platforms=web .
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          flutter pub get
+
+      - name: Build Web App
+        run: |
+          cd frontend
+          # Compile the web build and inject the backend URL
+          # Replace 'https://policemind-backend.onrender.com' with your actual deployed Render backend URL
+          flutter build web --release --dart-define=BACKEND_URL=https://policemind-backend.onrender.com
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend/build/web
+          branch: gh-pages
+          clean: true

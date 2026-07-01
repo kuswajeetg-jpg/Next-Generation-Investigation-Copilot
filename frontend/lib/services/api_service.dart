@@ -7,7 +7,10 @@ import '../models/case_model.dart';
 class ApiService {
   // Use http://10.0.2.2:8000 for Android Emulator, http://localhost:8000 for iOS simulator / web / desktop
   static String get baseUrl {
-    if (!kIsWeb && Platform.isAndroid) {
+    if (kIsWeb) {
+      return const String.fromEnvironment('BACKEND_URL', defaultValue: "http://localhost:8000");
+    }
+    if (Platform.isAndroid) {
       return "http://10.0.2.2:8000";
     }
     return "http://localhost:8000";
