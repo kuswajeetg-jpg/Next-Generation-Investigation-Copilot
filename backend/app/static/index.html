@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoliceMind AI – Next Generation Investigation Copilot</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Design System Token Styles */
+        :root {
+            --bg-color: #0b0f19;
+            --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #17172e 100%);
+            --surface-color: #1e293b;
+            --surface-border: #334155;
+            --primary-color: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --accent-color: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.4);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --card-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface-border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Page Layout */
+        .page-header {
+            text-align: center;
+            padding: 30px 20px 10px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Screen Wrapper styling */
+        .screen-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            padding: 20px 40px 60px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        /* Phone Simulator */
+        .phone-frame {
+            width: 100%;
+            max-width: 420px;
+            height: 800px;
+            background-color: #0f172a;
+            border: 8px solid #334155;
+            border-radius: 36px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(6, 182, 212, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* App Notch Status Bar */
+        .status-bar {
+            height: 34px;
+            background-color: #0f172a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            z-index: 10;
+        }
+
+        .status-bar .notch {
+            width: 110px;
+            height: 18px;
+            background-color: #334155;
+            border-radius: 0 0 12px 12px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* App Screen content switcher */
+        .app-screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .app-screen.active {
+            display: flex;
+        }
+
+        /* Guide Panel */
+        .guide-panel {
+            flex: 1;
+            min-width: 320px;
+            max-width: 580px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 26px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.3);
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .guide-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--surface-border);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-section {
+            margin-bottom: 24px;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .guide-section.active {
+            border-left-color: var(--accent-color);
+            background-color: rgba(6, 182, 212, 0.02);
+            border-radius: 0 8px 8px 0;
+            padding-right: 8px;
+        }
+
+        .guide-section-header {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-section-body {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .guide-badge {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Utility Components Styles */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--primary-glow);
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            color: var(--text-primary);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #334155;
+            box-shadow: none;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-accent:hover {
+            box-shadow: 0 6px 16px var(--accent-glow);
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--card-radius);
+            padding: 14px;
+            margin-bottom: 14px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #475569;
+        }
+
+        /* Screen 1: Login Screen */
+        #screen-login {
+            justify-content: center;
+            align-items: stretch;
+            background: linear-gradient(180deg, #0f172a 0%, #1e1e38 100%);
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50px;
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+            color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+        }
+
+        .brand-title {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: white;
+            text-align: center;
+        }
+
+        .brand-tagline {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-field {
+            width: 100%;
+            background-color: #0b0f19;
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: white;
+            font-family: inherit;
+            font-size: 13px;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .biometric-area {
+            border: 1px dashed var(--surface-border);
+            border-radius: var(--card-radius);
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .biometric-area:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(6, 182, 212, 0.02);
+        }
+
+        .biometric-icon {
+            font-size: 44px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .biometric-area.scanning .biometric-icon {
+            color: var(--accent-color);
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .scanner-bar {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color);
+            animation: scan 2s infinite ease-in-out;
+        }
+
+        .biometric-area.scanning .scanner-bar {
+            display: block;
+        }
+
+        /* Screen 2: Dashboard */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(6, 182, 212, 0.2);
+            border: 1px solid var(--accent-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--accent-color);
+        }
+
+        .officer-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .officer-badge {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .alert-ticker {
+            background-color: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .alert-ticker i {
+            color: var(--danger-color);
+            animation: flash 1s infinite alternate;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title span {
+            font-size: 11px;
+            color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .active-cases-list {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        .case-mini-card {
+            flex: 0 0 210px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .case-mini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        .case-status-badge {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+        }
+
+        .case-mini-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .case-mini-desc {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            height: 28px;
+            overflow: hidden;
+        }
+
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+        }
+
+        .progress-bar-bg {
+            flex: 1;
+            height: 4px;
+            background-color: #0f172a;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--warning-color);
+            border-radius: 2px;
+        }
+
+        /* Map styling */
+        .mock-map {
+            height: 160px;
+            background-color: #1e293b;
+            border: 1px solid var(--surface-border);
+            border-radius: var(--card-radius);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background-image: radial-gradient(#334155 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .mock-map-road {
+            position: absolute;
+            background-color: #475569;
+        }
+
+        .mock-map-road.horiz {
+            left: 0;
+            right: 0;
+            height: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .mock-map-road.vert {
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            left: 60%;
+        }
+
+        .mock-map-heat {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background-color: rgba(239, 68, 68, 0.15);
+            border-radius: 50%;
+            left: 30%;
+            top: 20%;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        .mock-map-pin {
+            position: absolute;
+            color: var(--danger-color);
+            font-size: 18px;
+            text-shadow: 0 0 6px rgba(0,0,0,0.5);
+        }
+
+        .mock-map-label {
+            position: absolute;
+            background-color: rgba(0,0,0,0.8);
+            border: 1px solid var(--surface-border);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: 700;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* Screen 3: New Case Upload Room */
+        .upload-selector {
+            border: 2px dashed var(--surface-border);
+            border-radius: var(--card-radius);
+            padding: 20px 14px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 14px;
+            transition: all 0.2s ease;
+            background-color: rgba(255,255,255,0.01);
+        }
+
+        .upload-selector:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(59, 130, 246, 0.02);
+        }
+
+        .upload-selector i {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .upload-selector.pdf i { color: #f87171; }
+        .upload-selector.audio i { color: var(--accent-color); }
+        .upload-selector.cctv i { color: var(--primary-color); }
+
+        .upload-selector-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .upload-selector-subtitle {
+            font-size: 9px;
+            color: var(--text-secondary);
+        }
+
+        .selected-file-panel {
+            background-color: var(--surface-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            margin-bottom: 16px;
+        }
+
+        /* Screen 4: Analysis Screen */
+        .dial-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .severity-radial {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(var(--danger-color) 0% 68%, #0f172a 68% 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+        }
+
+        .severity-radial::before {
+            content: '';
+            position: absolute;
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            background-color: var(--surface-color);
+        }
+
+        .severity-radial span {
+            position: relative;
+            font-size: 22px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            z-index: 2;
+        }
+
+        .list-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #0f172a;
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .avatar-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .avatar-circle.victim {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .missing-info-box {
+            background-color: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .missing-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .missing-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Screen 5: Timeline Screen */
+        .timeline-wrapper {
+            padding-left: 10px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 15px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background-color: var(--surface-border);
+            z-index: 1;
+        }
+
+        .timeline-node {
+            display: flex;
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            border: 3px solid #0f172a;
+            margin-left: 11px;
+            margin-top: 4px;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .timeline-details {
+            flex: 1;
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .timeline-time-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .timeline-time {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .timeline-source {
+            font-size: 8px;
+            background-color: #0f172a;
+            padding: 1px 5px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        /* Screen 6: Evidence Link Map */
+        .canvas-container {
+            width: 100%;
+            height: 300px;
+            background-color: #0b0f19;
+            border: 1px solid var(--surface-border);
+            border-radius: var(--card-radius);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        /* SVG Graph nodes representation */
+        .svg-graph {
+            width: 100%;
+            height: 100%;
+        }
+
+        .graph-node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .graph-node circle {
+            fill: #1e293b;
+            stroke-width: 2px;
+        }
+
+        .graph-node.victim circle { stroke: var(--success-color); fill: rgba(16, 185, 129, 0.1); }
+        .graph-node.suspect circle { stroke: var(--danger-color); fill: rgba(239, 68, 68, 0.1); }
+        .graph-node.phone circle { stroke: var(--accent-color); fill: rgba(6, 182, 212, 0.1); }
+        .graph-node.vehicle circle { stroke: var(--warning-color); fill: rgba(245, 158, 11, 0.1); }
+        .graph-node.cctv circle { stroke: #a855f7; fill: rgba(168, 85, 247, 0.1); }
+
+        .graph-node text {
+            fill: white;
+            font-size: 9px;
+            font-weight: bold;
+            text-anchor: middle;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .graph-edge {
+            stroke: var(--accent-color);
+            stroke-width: 1.5px;
+            stroke-opacity: 0.6;
+        }
+
+        .graph-edge-text {
+            fill: var(--text-secondary);
+            font-size: 8px;
+            text-anchor: middle;
+        }
+
+        /* Screen 7: Suggestions & Contradiction tools */
+        .text-area {
+            width: 100%;
+            background-color: #0b0f19;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-family: inherit;
+            font-size: 11px;
+            resize: none;
+            margin-bottom: 10px;
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .reconstruction-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: var(--card-radius);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .reconstruction-card i {
+            font-size: 28px;
+            color: var(--accent-color);
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        /* Modal styling */
+        .modal-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-sheet {
+            width: 100%;
+            background-color: #0f172a;
+            border-top: 1px solid var(--surface-border);
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sim-grid {
+            height: 140px;
+            background-color: #05070c;
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 15px 15px;
+        }
+
+        /* Screen 8: AI Report */
+        .report-section-box {
+            border-left: 3px solid var(--accent-color);
+            padding-left: 12px;
+            margin-bottom: 14px;
+        }
+
+        .report-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .report-section-body {
+            font-size: 11px;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
+        /* Keyframes Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 10px rgba(6, 182, 212, 0.1); }
+            100% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.35); }
+        }
+
+        @keyframes scan {
+            0% { top: 10%; }
+            50% { top: 90%; }
+            100% { top: 10%; }
+        }
+
+        @keyframes flash {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Navigation Bar */
+        .bottom-nav {
+            height: 60px;
+            background-color: #0f172a;
+            border-top: 1px solid var(--surface-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-header">
+        <h1>PoliceMind AI Copilot</h1>
+        <p>Next Generation Investigation Decision-Support Portal</p>
+    </div>
+
+    <div class="screen-container">
+        <!-- Phone Simulator Frame -->
+        <div class="phone-frame">
+            <!-- Notch Status Bar -->
+            <div class="status-bar">
+                <div class="time-stamp">20:45</div>
+                <div class="notch"></div>
+                <div class="icons">
+                    <i class="fa-solid fa-signal"></i>
+                    <i class="fa-solid fa-wifi" style="margin: 0 4px;"></i>
+                    <i class="fa-solid fa-battery-three-quarters"></i>
+                </div>
+            </div>
+
+            <!-- Screen 1: Login Screen -->
+            <div id="screen-login" class="app-screen active">
+                <div class="logo-container">
+                    <div class="logo-circle">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="brand-title">POLICEMIND AI</div>
+                    <div class="brand-tagline">Next Generation Investigation Copilot</div>
+                </div>
+
+                <div class="input-group">
+                    <label>Police ID / Badge Number</label>
+                    <input type="text" class="input-field" value="POLICE-2026-99A" readonly>
+                </div>
+                <div class="input-group" style="margin-bottom: 24px;">
+                    <label>Security PIN</label>
+                    <input type="password" class="input-field" value="••••••••" readonly>
+                </div>
+
+                <button class="btn" onclick="navigateTo('screen-dashboard')">ACCESS PORTAL</button>
+
+                <div class="biometric-area" id="bio-scan" onclick="triggerBiometricScan()">
+                    <div class="scanner-bar"></div>
+                    <i class="fa-solid fa-fingerprint biometric-icon"></i>
+                    <div style="font-size: 11px; font-weight: 600;" id="bio-scan-text">Tap to Scan Biometrics</div>
+                </div>
+            </div>
+
+            <!-- Screen 2: Dashboard -->
+            <div id="screen-dashboard" class="app-screen">
+                <div class="app-header">
+                    <div class="profile-section">
+                        <div class="avatar">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <div class="officer-name">Insp. A. Hasan</div>
+                            <div class="officer-badge">POLICE-2026-99A</div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <i class="fa-regular fa-bell" style="font-size: 20px;"></i>
+                        <span style="position: absolute; top:-4px; right:-4px; background:var(--danger-color); width:8px; height:8px; border-radius:50%"></span>
+                    </div>
+                </div>
+
+                <!-- Alert Ticker -->
+                <div class="alert-ticker">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>AI ALERT: Contradiction found in Mehta Jewellers testimonies.</div>
+                </div>
+
+                <!-- New Case Action Card -->
+                <div class="card" style="background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%); border:none; cursor:pointer;" onclick="navigateTo('screen-newcase')">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 style="font-size:18px; margin-bottom:4px;">New Investigation</h3>
+                            <p style="font-size:11px; opacity:0.8;">Process FIR files, CCTV, or record statements.</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; justify-content:center; align-items:center;">
+                            <i class="fa-solid fa-plus" style="font-size:18px;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Cases -->
+                <div class="section-title">
+                    Active Cases
+                    <span>View All</span>
+                </div>
+                <div class="active-cases-list">
+                    <!-- Case Card -->
+                    <div class="case-mini-card" onclick="loadMockCase()">
+                        <div class="case-mini-header">
+                            FIR-2026-891
+                            <span class="case-status-badge">Active</span>
+                        </div>
+                        <div class="case-mini-title">Burglary at Mehta Jewellers</div>
+                        <div class="case-mini-desc">Intruder bypassed locks at rear gate. getaway sedan spotted.</div>
+                        <div class="progress-bar-container">
+                            <span>Severity:</span>
+                            <span style="font-weight:700; color:var(--warning-color);">68%</span>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 68%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Case Card 2 -->
+                    <div class="case-mini-card">
+                        <div class="case-mini-header" style="color:var(--danger-color)">
+                            FIR-2026-104
+                            <span class="case-status-badge" style="background:rgba(245,158,11,0.1); color:var(--warning-color)">Pending</span>
+                        </div>
+                        <div class="case-mini-title">Cyber Extortion Attack</div>
+                        <div class="case-mini-desc">Ransomware encryption targeting database records.</div>
+                        <div class="progress-bar-container">
+                            <span>Severity:</span>
+                            <span style="font-weight:700; color:var(--danger-color);">82%</span>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 82%; background-color: var(--danger-color);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prediction Hotspot Map -->
+                <div class="section-title">Crime Hotspot Map</div>
+                <div class="mock-map">
+                    <div class="mock-map-road horiz"></div>
+                    <div class="mock-map-road vert"></div>
+                    <div class="mock-map-heat"></div>
+                    <div class="mock-map-pin" style="left: 35%; top: 30%;">
+                        <i class="fa-solid fa-location-pin"></i>
+                    </div>
+                    <div class="mock-map-label" style="left: 37%; top: 46%;">
+                        Burglary Risk Zone
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 3: New Case Upload Room -->
+            <div id="screen-newcase" class="app-screen">
+                <div class="app-header">
+                    <i class="fa-solid fa-arrow-left" onclick="navigateTo('screen-dashboard')" style="cursor:pointer; font-size:18px;"></i>
+                    <h2 style="font-size:18px; font-weight:700; flex:1; text-align:center;">New Case</h2>
+                    <div style="width:18px;"></div>
+                </div>
+
+                <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px; text-align:center;">
+                    Select evidence format to run processing.
+                </p>
+
+                <!-- Pickers -->
+                <div class="upload-selector pdf" onclick="selectEvidenceFile('PDF', 'FIR_MehtaJewellers_2026.pdf')">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <div class="upload-selector-title">FIR Document Upload</div>
+                    <div class="upload-selector-subtitle">Select FIR PDF or Scanned Images</div>
+                </div>
+
+                <div class="upload-selector audio" onclick="selectEvidenceFile('Audio', 'witness_audio_clash.wav')">
+                    <i class="fa-solid fa-microphone"></i>
+                    <div class="upload-selector-title">Voice Complaint Dictation</div>
+                    <div class="upload-selector-subtitle">Record statement or upload audio clip</div>
+                </div>
+
+                <div class="upload-selector cctv" onclick="selectEvidenceFile('Video', 'cctv_shutter_leak.jpg')">
+                    <i class="fa-solid fa-video"></i>
+                    <div class="upload-selector-title">CCTV / Photo Evidence</div>
+                    <div class="upload-selector-subtitle">Select surveillance footage or snapshots</div>
+                </div>
+
+                <div id="file-selection-indicator" style="display:none;">
+                    <div class="selected-file-panel">
+                        <i id="indicator-icon" class="fa-solid fa-file-pdf" style="font-size:18px; color:var(--accent-color);"></i>
+                        <div style="flex:1;">
+                            <div id="indicator-name" style="font-size:12px; font-weight:700;">file.pdf</div>
+                            <div style="font-size:10px; color:var(--text-secondary);">Ready for processing</div>
+                        </div>
+                        <i class="fa-solid fa-circle-xmark" style="cursor:pointer; color:var(--text-secondary);" onclick="clearEvidenceSelection()"></i>
+                    </div>
+                    
+                    <button class="btn btn-accent" style="width:100%; margin-top:10px;" id="btn-analyze" onclick="startAIAnalysis()">
+                        <i class="fa-solid fa-brain"></i> ANALYZE CASE WITH AI
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI processing overlay screen -->
+            <div id="screen-processing" class="app-screen" style="justify-content:center; align-items:center;">
+                <div style="position:relative; width:120px; height:120px; display:flex; justify-content:center; align-items:center; margin-bottom:30px;">
+                    <div style="position:absolute; width:100%; height:100%; border:4px solid var(--surface-border); border-top:4px solid var(--accent-color); border-radius:50%; animation: spin 1s infinite linear;"></div>
+                    <i class="fa-solid fa-brain" style="font-size:42px; color:var(--accent-color);"></i>
+                </div>
+                <h3 style="font-size:20px; margin-bottom:8px;" id="proc-title">AI Processing</h3>
+                <p style="font-size:12px; color:var(--text-secondary); text-align:center; max-width:240px;" id="proc-subtitle">OCR Text extraction in progress...</p>
+            </div>
+
+            <!-- Screen 4: AI Analysis screen -->
+            <div id="screen-analysis" class="app-screen">
+                <div class="app-header">
+                    <i class="fa-solid fa-arrow-left" onclick="navigateTo('screen-dashboard')" style="cursor:pointer; font-size:18px;"></i>
+                    <h2 style="font-size:18px; font-weight:700; flex:1; text-align:center;">AI Analysis</h2>
+                    <div style="width:18px;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <div style="font-size:20px; font-weight:700; color:var(--accent-color);">FIR-2026-891</div>
+                    <span style="font-size:10px; font-weight:700; background:rgba(59,130,246,0.1); color:var(--primary-color); border:1px solid rgba(59,130,246,0.3); padding:4px 10px; border-radius:20px;">GRAND LARCENY</span>
+                </div>
+
+                <!-- Dial -->
+                <div class="dial-row">
+                    <div class="severity-radial">
+                        <span>68</span>
+                    </div>
+                    <div>
+                        <div style="font-size:15px; font-weight:700;">Severity Index</div>
+                        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">Standard priority case. Gateway target lock checked.</div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div style="font-size:13px; font-weight:700; margin-bottom:6px;">Incident Summary</div>
+                <p style="font-size:12px; line-height:1.4; color:var(--text-secondary); margin-bottom:20px;">
+                    On July 1st, 2026, a suspect bypassed rear security latch locks at Rajesh Mehta's jewelry shop, leaving a mobile phone on counter and escaping in a black getaway vehicle.
+                </p>
+
+                <!-- Suspect list -->
+                <div style="font-size:13px; font-weight:700; margin-bottom:10px;">Extracted Suspects (2)</div>
+                <div class="list-profile">
+                    <div class="avatar-circle">
+                        <i class="fa-solid fa-user-secret"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:13px; font-weight:700;">Vikram Malhotra</div>
+                        <div style="font-size:10px; color:var(--text-secondary);">Matches description, alibi discrepancies flagged.</div>
+                    </div>
+                </div>
+                <div class="list-profile" style="margin-bottom:20px;">
+                    <div class="avatar-circle">
+                        <i class="fa-solid fa-user-secret"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:13px; font-weight:700;">Unknown Getaway Driver</div>
+                        <div style="font-size:10px; color:var(--text-secondary);">Operated getaway sedan.</div>
+                    </div>
+                </div>
+
+                <!-- Missing Info details -->
+                <div style="font-size:13px; font-weight:700; margin-bottom:10px;">Missing Information</div>
+                <div class="missing-info-box" style="margin-bottom:24px;">
+                    <div class="missing-info-item">
+                        <i class="fa-solid fa-circle-question" style="color:var(--warning-color); margin-top:2px;"></i>
+                        <div>CCTV intersection camera records at High Street.</div>
+                    </div>
+                    <div class="missing-info-item">
+                        <i class="fa-solid fa-circle-question" style="color:var(--warning-color); margin-top:2px;"></i>
+                        <div>Fingerprint matching scans on rear lock latch handles.</div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="navigateTo('screen-timeline')">PROCEED TO TIMELINE</button>
+            </div>
+
+            <!-- Screen 5: Smart Timeline -->
+            <div id="screen-timeline" class="app-screen">
+                <div class="app-header">
+                    <i class="fa-solid fa-arrow-left" onclick="navigateTo('screen-analysis')" style="cursor:pointer; font-size:18px;"></i>
+                    <h2 style="font-size:18px; font-weight:700; flex:1; text-align:center;">Chronological Timeline</h2>
+                    <div style="width:18px;"></div>
+                </div>
+
+                <!-- Timeline list -->
+                <div class="timeline-wrapper">
+                    <div class="timeline-line"></div>
+                    
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-details">
+                            <div class="timeline-time-row">
+                                <div class="timeline-time">08:30 PM</div>
+                                <span class="timeline-source">Witness</span>
+                            </div>
+                            <div style="font-size:12px; font-weight:700; margin-top:4px;">Victim Left Home</div>
+                            <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">Sanjay left residence to lock up the store.</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-details">
+                            <div class="timeline-time-row">
+                                <div class="timeline-time">08:45 PM</div>
+                                <span class="timeline-source">CCTV</span>
+                            </div>
+                            <div style="font-size:12px; font-weight:700; margin-top:4px;">CCTV Shadow Detection</div>
+                            <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">Rear gate cameras record a dark silhouette bypassing security.</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-details">
+                            <div class="timeline-time-row">
+                                <div class="timeline-time">09:00 PM</div>
+                                <span class="timeline-source">Telecom</span>
+                            </div>
+                            <div style="font-size:12px; font-weight:700; margin-top:4px;">Victim Phone Off</div>
+                            <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">Signal dropped from the local cell tower.</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-details">
+                            <div class="timeline-time-row">
+                                <div class="timeline-time">09:15 PM</div>
+                                <span class="timeline-source">Alarm</span>
+                            </div>
+                            <div style="font-size:12px; font-weight:700; margin-top:4px;">Silent Alarm Trigger</div>
+                            <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">Silent alarm triggered at main jewelry counter.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="navigateTo('screen-linkmap')">VIEW EVIDENCE LINK MAP</button>
+            </div>
+
+            <!-- Screen 6: Evidence Link Map -->
+            <div id="screen-linkmap" class="app-screen">
+                <div class="app-header">
+                    <i class="fa-solid fa-arrow-left" onclick="navigateTo('screen-timeline')" style="cursor:pointer; font-size:18px;"></i>
+                    <h2 style="font-size:18px; font-weight:700; flex:1; text-align:center;">Evidence Link Map</h2>
+                    <div style="width:18px;"></div>
+                </div>
+
+                <!-- SVG Graph container -->
+                <div class="canvas-container">
+                    <svg class="svg-graph">
+                        <!-- Edges -->
+                        <line x1="200" y1="150" x2="100" y2="60" class="graph-edge"></line>
+                        <line x1="200" y1="150" x2="300" y2="60" class="graph-edge"></line>
+                        <line x1="100" y1="60" x2="100" y2="230" class="graph-edge"></line>
+                        <line x1="300" y1="60" x2="300" y2="230" class="graph-edge"></line>
+                        <line x1="100" y1="230" x2="200" y2="150" class="graph-edge"></line>
+
+                        <!-- Nodes -->
+                        <!-- Center Victim Node -->
+                        <g class="graph-node victim" transform="translate(200, 150)">
+                            <circle r="22"></circle>
+                            <text y="4">Sanjay</text>
+                        </g>
+                        <!-- Phone Node -->
+                        <g class="graph-node phone" transform="translate(100, 60)">
+                            <circle r="20"></circle>
+                            <text y="4">Phone</text>
+                        </g>
+                        <!-- CCTV Node -->
+                        <g class="graph-node cctv" transform="translate(300, 60)">
+                            <circle r="20"></circle>
+                            <text y="4">CCTV</text>
+                        </g>
+                        <!-- Suspect Node -->
+                        <g class="graph-node suspect" transform="translate(100, 230)">
+                            <circle r="20"></circle>
+                            <text y="4">Vikram</text>
+                        </g>
+                        <!-- Vehicle Node -->
+                        <g class="graph-node vehicle" transform="translate(300, 230)">
+                            <circle r="20"></circle>
+                            <text y="4">Vehicle</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Link lists -->
+                <div style="font-size:12px; font-weight:700; margin-bottom:10px;">Identified Relations (USP)</div>
+                <div style="overflow-y:auto; flex:1; margin-bottom:14px;">
+                    <div class="card" style="padding:10px; margin-bottom:8px; font-size:11px;">
+                        <i class="fa-solid fa-link" style="color:var(--accent-color); margin-right:8px;"></i>
+                        <strong>VIKRAM</strong> owns registered getaway <strong>VEHICLE</strong>.
+                    </div>
+                    <div class="card" style="padding:10px; margin-bottom:8px; font-size:11px;">
+                        <i class="fa-solid fa-link" style="color:var(--accent-color); margin-right:8px;"></i>
+                        <strong>CCTV</strong> captured <strong>VEHICLE</strong> leaving at 09:16 PM.
+                    </div>
+                    <div class="card" style="padding:10px; margin-bottom:8px; font-size:11px;">
+                        <i class="fa-solid fa-link" style="color:var(--accent-color); margin-right:8px;"></i>
+                        <strong>PHONE</strong> GPS signals match <strong>CCTV</strong> area.
+                    </div>
+                </div>
+
+                <button class="btn" onclick="navigateTo('screen-suggestions')">AI RECOMMENDATIONS</button>
+            </div>
+
+            <!-- Screen 7: suggestions & contradiction checks -->
+            <div id="screen-suggestions" class="app-screen">
+                <div class="app-header">
+                    <i class="fa-solid fa-arrow-left" onclick="navigateTo('screen-linkmap')" style="cursor:pointer; font-size:18px;"></i>
+                    <h2 style="font-size:18px; font-weight:700; flex:1; text-align:center;">AI Suggestions</h2>
+                    <div style="width:18px;"></div>
+                </div>
+
+                <!-- list checklist suggestions -->
+                <div style="font-size:13px; font-weight:700; margin-bottom:10px;">Recommended Next Steps</div>
+                <div class="card" style="padding:10px; margin-bottom:8px; display:flex; align-items:center; gap:10px; font-size:11px;">
+                    <input type="checkbox" style="accent-color:var(--accent-color)">
+                    <div style="flex:1;">Check Nearby Intersection CCTV at Mall Road</div>
+                    <span style="font-size:8px; padding:2px 6px; background:rgba(239,68,68,0.1); color:var(--danger-color); border-radius:4px; font-weight:700;">HIGH</span>
+                </div>
+                <div class="card" style="padding:10px; margin-bottom:16px; display:flex; align-items:center; gap:10px; font-size:11px;">
+                    <input type="checkbox" style="accent-color:var(--accent-color)">
+                    <div style="flex:1;">Verify Vehicle registration log matches Vikram Malhotra</div>
+                    <span style="font-size:8px; padding:2px 6px; background:rgba(245,158,11,0.1); color:var(--warning-color); border-radius:4px; font-weight:700;">MED</span>
+                </div>
+
+                <!-- Contradiction box -->
+                <div style="font-size:13px; font-weight:700; margin-bottom:10px;">Statement Contradiction Detector</div>
+                <div class="card" style="margin-bottom:16px;">
+                    <textarea id="stmtA" class="text-area" rows="2" placeholder="Witness Rajesh Statement">Witness Rajesh: I saw a black SUV parked outside at 9:15 PM.</textarea>
+                    <textarea id="stmtB" class="text-area" rows="2" placeholder="Suspect Vikram Statement">Suspect Vikram: I was at diner. I drive a silver sedan.</textarea>
+                    <button class="btn btn-secondary" style="width:100%; padding:10px; font-size:13px;" onclick="checkContradictionsLocal()">ANALYZE STATEMENTS</button>
+                    
+                    <div id="contra-alert" style="display:none; margin-top:10px; padding:10px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:8px; font-size:11px;">
+                        <div style="color:var(--danger-color); font-weight:700; margin-bottom:4px;"><i class="fa-solid fa-triangle-exclamation"></i> DISCREPANCY DETECTED</div>
+                        Vehicle color contradiction: Black SUV reported vs. Silver Sedan registered to suspect.
+                    </div>
+                </div>
+
+                <!-- USP 3D Scene Reconstruction teaser -->
+                <div class="reconstruction-card" onclick="open3DReconstruction()">
+                    <i class="fa-solid fa-cube"></i>
+                    <div style="flex:1;">
+                        <h4 style="font-size:14px; font-weight:700;">3D Scene Reconstruction</h4>
+                        <p style="font-size:9px; color:var(--text-secondary); margin-top:2px;">Simulate physical entry and exit flows on structural map.</p>
+                    </div>
+                    <i class="fa-solid fa-circle-play" style="font-size:24px;"></i>
+                </div>
+
+                <button class="btn" onclick="navigateTo('screen-report')">COMPILE FINAL REPORT</button>
+            </div>
+
+            <!-- Screen 8: AI Report -->
+            <div id="screen-report" class="app-screen">
+                <div class="app-header">
+                    <i class="fa-solid fa-arrow-left" onclick="navigateTo('screen-suggestions')" style="cursor:pointer; font-size:18px;"></i>
+                    <h2 style="font-size:18px; font-weight:700; flex:1; text-align:center;">AI Case Report</h2>
+                    <div style="width:18px;"></div>
+                </div>
+
+                <!-- Compiled contents -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="report-section-box">
+                        <div class="report-section-title">Case Metadata</div>
+                        <div class="report-section-body">
+                            FIR-2026-891 | Grand Larceny | Severity Index: 68
+                        </div>
+                    </div>
+                    <div class="report-section-box">
+                        <div class="report-section-title">Case Summary</div>
+                        <div class="report-section-body">
+                            Intruder bypassed locks at rear gate. getaway sedan registered to Vikram Malhotra was detected by surveillance cameras.
+                        </div>
+                    </div>
+                    <div class="report-section-box">
+                        <div class="report-section-title">Discovered Discrepancies</div>
+                        <div class="report-section-body">
+                            1. Getaway vehicle color mismatch (Witness says SUV vs Suspect sedan registration).
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-accent" style="width:100%; margin-bottom:14px;" onclick="triggerPDFExport()">
+                    <i class="fa-solid fa-file-pdf"></i> EXPORT TO PDF
+                </button>
+                <button class="btn btn-secondary" style="width:100%;" onclick="navigateTo('screen-dashboard')">
+                    RETURN TO DASHBOARD
+                </button>
+            </div>
+
+            <!-- Bottom simulator Nav bar -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="navigateTo('screen-dashboard')">
+                    <i class="fa-solid fa-house-chimney"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('screen-newcase')">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Evidence</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('screen-suggestions')">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>Suggestions</span>
+                </div>
+            </div>
+
+            <!-- Modal for 3D simulation -->
+            <div class="modal-overlay" id="sim-modal">
+                <div class="modal-sheet">
+                    <div class="modal-header">
+                        <h3 style="font-size:16px; font-weight:700; color:var(--accent-color);">3D Scene Reconstruction</h3>
+                        <i class="fa-solid fa-circle-xmark" style="cursor:pointer; font-size:18px; color:var(--text-secondary);" onclick="close3DReconstruction()"></i>
+                    </div>
+                    <p style="font-size:10px; color:var(--text-secondary);">
+                        Coordinates plotted by Gemini spatial reasoning. Simulates access alley entry route.
+                    </p>
+
+                    <!-- Coordinate canvas painter simulator -->
+                    <div class="sim-grid">
+                        <svg style="width:100%; height:100%">
+                            <path d="M 40,110 Q 180,20 360,80" fill="none" stroke="var(--accent-color)" stroke-width="3" stroke-dasharray="6,4"></path>
+                            <!-- Coords markers -->
+                            <circle cx="40" cy="110" r="5" fill="var(--success-color)"></circle>
+                            <text x="40" y="125" fill="white" font-size="8" text-anchor="middle">Entry Gate</text>
+                            
+                            <circle cx="180" cy="50" r="5" fill="var(--warning-color)"></circle>
+                            <text x="180" y="40" fill="white" font-size="8" text-anchor="middle">Fuse box</text>
+                            
+                            <circle cx="360" cy="80" r="5" fill="var(--danger-color)"></circle>
+                            <text x="360" y="95" fill="white" font-size="8" text-anchor="middle">Counter Room</text>
+                        </svg>
+                    </div>
+
+                    <button class="btn btn-secondary" style="padding:10px; font-size:13px;" onclick="close3DReconstruction()">CLOSE SIMULATOR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side Guide Panel -->
+        <div class="guide-panel">
+            <h2 class="guide-title">
+                <i class="fa-solid fa-book-open"></i> Copilot User Guide
+            </h2>
+
+            <!-- Section 1 -->
+            <div class="guide-section active" id="guide-sec-login">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 1</span>
+                    Secure Officer Access
+                </div>
+                <div class="guide-section-body">
+                    Investigators log in securely using credentials or quick biometrics.
+                    <br><br>
+                    <strong>💡 How to use:</strong>
+                    <br>
+                    • Standard Login: Click <strong>Access Portal</strong> using the default badge ID.
+                    <br>
+                    • Biometric Access: Tap the <strong>Fingerprint Scan Area</strong>. An electric green scanner bar overlay will sweep down to verify biometrics and redirect you to the main dashboard.
+                </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="guide-section" id="guide-sec-dashboard">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 2</span>
+                    Investigation Dashboard
+                </div>
+                <div class="guide-section-body">
+                    The control center provides an overview of active cases, predictive maps, and alerts.
+                    <br><br>
+                    <strong>💡 Features explained:</strong>
+                    <br>
+                    • <strong>AI Alert Ticker</strong>: Dynamically highlights high-priority contradictions discovered during testimony matches.
+                    <br>
+                    • <strong>New Case Button</strong>: Launches the evidence catalog scanner rooms.
+                    <br>
+                    • <strong>Active Cases List</strong>: Shows progress cards. Click the <em>Mehta Jewellers card</em> to load the detailed analysis.
+                    <br>
+                    • <strong>Crime Hotspot Map</strong>: Highlights high-risk zones compiled from surrounding crime logs.
+                </div>
+            </div>
+
+            <!-- Section 3 -->
+            <div class="guide-section" id="guide-sec-newcase">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 3</span>
+                    New Case Upload Room
+                </div>
+                <div class="guide-section-body">
+                    Upload media, documents, or logs to initiate AI parsing.
+                    <br><br>
+                    <strong>💡 How to use:</strong>
+                    <br>
+                    • Click any selector (PDF, Voice Complaint, or CCTV Evidence) to simulate picking a file.
+                    <br>
+                    • A blue card details panel will emerge showing file specifications.
+                    <br>
+                    • Click <strong>Analyze Case with AI</strong> to trigger the multi-step loading sequence, routing raw bytes to Gemini API processing.
+                </div>
+            </div>
+
+            <!-- Section 4 -->
+            <div class="guide-section" id="guide-sec-analysis">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 4</span>
+                    AI Incident Analysis
+                </div>
+                <div class="guide-section-body">
+                    Extracts suspects, victims, and prioritizes case focus.
+                    <br><br>
+                    <strong>💡 Option meanings:</strong>
+                    <br>
+                    • <strong>Severity Index</strong>: A score out of 100 representing crime severity (e.g. 68% grand larceny).
+                    <br>
+                    • <strong>Extracted Suspects</strong>: Names parsed by Gemini NLP algorithms.
+                    <br>
+                    • <strong>Missing Information</strong>: Points out structural gaps in files that officers need to address immediately.
+                </div>
+            </div>
+
+            <!-- Section 5 -->
+            <div class="guide-section" id="guide-sec-timeline">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 5</span>
+                    Chronological Timeline
+                </div>
+                <div class="guide-section-body">
+                    AI synthesizes witness statements, CCTV logs, and telecom records to construct a chronological order of events.
+                    <br><br>
+                    <strong>💡 Option meanings:</strong>
+                    <br>
+                    • Shows exact time cards connected by vertical timeline channels.
+                    <br>
+                    • Displays source tags (e.g., <em>Witness</em>, <em>CCTV</em>, <em>Telecom</em>) representing which document verified the event.
+                </div>
+            </div>
+
+            <!-- Section 6 -->
+            <div class="guide-section" id="guide-sec-linkmap">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 6</span>
+                    Evidence Link Map (USP)
+                </div>
+                <div class="guide-section-body">
+                    A visual network graph mapping relationships between victims, phones, CCTVs, suspects, and vehicles.
+                    <br><br>
+                    <strong>💡 Option meanings:</strong>
+                    <br>
+                    • <strong>Green node</strong>: Victims.
+                    <br>
+                    • <strong>Red node</strong>: Suspects.
+                    <br>
+                    • <strong>Cyan / Yellow / Purple nodes</strong>: Phones, vehicles, and CCTV cameras.
+                    <br>
+                    • <strong>Edges</strong>: Dynamic lines connecting nodes, detailing relationship descriptions (e.g., Vikram owns Vehicle).
+                </div>
+            </div>
+
+            <!-- Section 7 -->
+            <div class="guide-section" id="guide-sec-suggestions">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 7</span>
+                    AI Suggestions & Checker
+                </div>
+                <div class="guide-section-body">
+                    Provides next actions, contradiction checkers, and scene simulators.
+                    <br><br>
+                    <strong>💡 Features explained:</strong>
+                    <br>
+                    • <strong>Recommended Next Steps</strong>: Checkbox tasks with priority ratings.
+                    <br>
+                    • <strong>Contradiction Detector</strong>: Paste/read witness A and B accounts, and click <em>Analyze</em> to highlight conflicting statements.
+                    <br>
+                    • <strong>3D Scene Reconstruction</strong>: Click the purple card play button to open the coordinate path mapping sheet representing entry paths.
+                </div>
+            </div>
+
+            <!-- Section 8 -->
+            <div class="guide-section" id="guide-sec-report">
+                <div class="guide-section-header">
+                    <span class="guide-badge">Screen 8</span>
+                    AI Case Report & Print
+                </div>
+                <div class="guide-section-body">
+                    Compiles case summaries, discrepancies, and timelines into a formatted document.
+                    <br><br>
+                    <strong>💡 How to use:</strong>
+                    <br>
+                    • Review compiled sections inside the report card.
+                    <br>
+                    • Click <strong>Export to PDF</strong> to trigger a system dialog simulating case compilation and local storage printing.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Javascript implementation controller -->
+    <script>
+        // Screen Navigation
+        function navigateTo(screenId) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.app-screen');
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Show selected screen
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.add('active');
+            }
+
+            // Sync Bottom Nav selection state
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (screenId === 'screen-dashboard') {
+                navItems[0].classList.add('active');
+            } else if (screenId === 'screen-newcase') {
+                navItems[1].classList.add('active');
+            } else if (screenId === 'screen-suggestions' || screenId === 'screen-linkmap' || screenId === 'screen-timeline') {
+                navItems[2].classList.add('active');
+            }
+
+            // Highlight corresponding guide panel section
+            highlightGuideSection(screenId);
+        }
+
+        // Highlight Guide Section in Accordion Guide
+        function highlightGuideSection(screenId) {
+            const sections = document.querySelectorAll('.guide-section');
+            sections.forEach(sec => {
+                sec.classList.remove('active');
+            });
+
+            let targetSecId = 'guide-sec-login';
+            if (screenId === 'screen-dashboard') targetSecId = 'guide-sec-dashboard';
+            else if (screenId === 'screen-newcase') targetSecId = 'guide-sec-newcase';
+            else if (screenId === 'screen-analysis') targetSecId = 'guide-sec-analysis';
+            else if (screenId === 'screen-timeline') targetSecId = 'guide-sec-timeline';
+            else if (screenId === 'screen-linkmap') targetSecId = 'guide-sec-linkmap';
+            else if (screenId === 'screen-suggestions') targetSecId = 'guide-sec-suggestions';
+            else if (screenId === 'screen-report') targetSecId = 'guide-sec-report';
+
+            const targetSec = document.getElementById(targetSecId);
+            if (targetSec) {
+                targetSec.classList.add('active');
+                targetSec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Biometric Face Scan Simulation
+        function triggerBiometricScan() {
+            const bioArea = document.getElementById('bio-scan');
+            const bioText = document.getElementById('bio-scan-text');
+            
+            if (bioArea.classList.contains('scanning')) return;
+            
+            bioArea.classList.add('scanning');
+            bioText.innerText = "Analyzing Face & Fingerprint...";
+            
+            setTimeout(() => {
+                bioArea.classList.remove('scanning');
+                bioText.innerText = "Biometric Lock Verified";
+                setTimeout(() => {
+                    navigateTo('screen-dashboard');
+                    bioText.innerText = "Tap to Scan Biometrics";
+                }, 400);
+            }, 2000);
+        }
+
+        // File selections
+        let selectedFile = null;
+        function selectEvidenceFile(type, name) {
+            selectedFile = { type, name };
+            const indicator = document.getElementById('file-selection-indicator');
+            const icon = document.getElementById('indicator-icon');
+            const nameLabel = document.getElementById('indicator-name');
+            
+            indicator.style.display = 'block';
+            nameLabel.innerText = name;
+            
+            if (type === 'PDF') {
+                icon.className = "fa-solid fa-file-pdf";
+                icon.style.color = "#f87171";
+            } else if (type === 'Audio') {
+                icon.className = "fa-solid fa-microphone";
+                icon.style.color = "var(--accent-color)";
+            } else {
+                icon.className = "fa-solid fa-image";
+                icon.style.color = "var(--primary-color)";
+            }
+        }
+
+        function clearEvidenceSelection() {
+            selectedFile = null;
+            document.getElementById('file-selection-indicator').style.display = 'none';
+        }
+
+        // AI processing steps
+        function startAIAnalysis() {
+            navigateTo('screen-processing');
+            const pTitle = document.getElementById('proc-title');
+            const pSub = document.getElementById('proc-subtitle');
+            
+            setTimeout(() => {
+                pSub.innerText = selectedFile.type === 'Audio' ? "Running Whisper voice speech translation..." : "Running ML Kit OCR text parser...";
+                setTimeout(() => {
+                    pSub.innerText = "Querying Gemini API copilot services...";
+                    setTimeout(() => {
+                        pSub.innerText = "Generating relationship links and chronological events...";
+                        setTimeout(() => {
+                            navigateTo('screen-analysis');
+                            clearEvidenceSelection();
+                        }, 800);
+                    }, 800);
+                }, 800);
+            }, 800);
+        }
+
+        // Load mock case immediately
+        function loadMockCase() {
+            navigateTo('screen-analysis');
+        }
+
+        // Contradiction checks local
+        function checkContradictionsLocal() {
+            const alert = document.getElementById('contra-alert');
+            alert.style.display = 'block';
+        }
+
+        // 3D reconstruction modal triggers
+        function open3DReconstruction() {
+            const overlay = document.getElementById('sim-modal');
+            overlay.classList.add('active');
+        }
+
+        function close3DReconstruction() {
+            const overlay = document.getElementById('sim-modal');
+            overlay.classList.remove('active');
+        }
+
+        // PDF compiles exporter popup
+        function triggerPDFExport() {
+            alert("AI Compiled Case Report 'FIR-2026-891_CaseStudy.pdf' exported successfully to device Downloads folder.");
+        }
+    </script>
+</body>
+</html>
