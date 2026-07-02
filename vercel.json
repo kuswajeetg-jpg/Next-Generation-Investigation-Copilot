@@ -9,7 +9,7 @@
   ],
   "functions": {
     "api/index.py": {
-      "excludeFiles": "{flutter/**,frontend/**}"
+      "excludeFiles": "{flutter/**,frontend/**,.git/**,.github/**,.pub-cache/**,venv/**,backend/venv/**,backend/tests/**}"
     }
   }
 }
