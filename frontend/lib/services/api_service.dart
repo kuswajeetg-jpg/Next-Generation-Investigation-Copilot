@@ -5,8 +5,13 @@ import 'package:http/http.dart' as http;
 import '../models/case_model.dart';
 
 class ApiService {
+  static String? _baseUrlOverride;
+
   // Use http://10.0.2.2:8000 for Android Emulator, http://localhost:8000 for iOS simulator / web / desktop
   static String get baseUrl {
+    if (_baseUrlOverride != null && _baseUrlOverride!.isNotEmpty) {
+      return _baseUrlOverride!;
+    }
     if (kIsWeb) {
       return const String.fromEnvironment('BACKEND_URL', defaultValue: "http://localhost:8000");
     }
@@ -14,6 +19,10 @@ class ApiService {
       return "http://10.0.2.2:8000";
     }
     return "http://localhost:8000";
+  }
+
+  static void setBaseUrl(String url) {
+    _baseUrlOverride = url;
   }
 
   // Upload FIR PDF or Image and return case structure
