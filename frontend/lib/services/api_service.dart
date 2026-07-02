@@ -13,7 +13,15 @@ class ApiService {
       return _baseUrlOverride!;
     }
     if (kIsWeb) {
-      return const String.fromEnvironment('BACKEND_URL', defaultValue: "http://localhost:8000");
+      const envUrl = String.fromEnvironment('BACKEND_URL');
+      if (envUrl.isNotEmpty) {
+        return envUrl;
+      }
+      final origin = Uri.base.origin;
+      if (origin.contains('localhost') || origin.contains('127.0.0.1')) {
+        return "http://localhost:8000";
+      }
+      return origin; // Use same-domain hosting in production (e.g. Vercel)
     }
     if (Platform.isAndroid) {
       return "http://10.0.2.2:8000";

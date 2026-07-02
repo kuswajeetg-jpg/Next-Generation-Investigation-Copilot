@@ -69,3 +69,26 @@ Double-click the **[run_project.bat](file:///d:/Abul%20Hasan/Next%20Generation%2
 
 ### 3. Manual Steps
 If running manually, refer to the detailed commands guide inside the **[walkthrough.md](file:///C:/Users/Kuswajeet/.gemini/antigravity/brain/de34ec7b-53e1-4997-bce9-f2b36ef37238/walkthrough.md)**.
+
+---
+
+## 🌐 Deploying to Vercel (Frontend & Backend)
+
+PoliceMind AI is pre-configured to build and deploy as a monorepo on **Vercel** with a unified domain.
+
+### Setup Steps
+1. **Push your code to GitHub**: Create a repository and push your project files.
+2. **Connect to Vercel**:
+   - Go to the Vercel Dashboard and click **Add New** > **Project**.
+   - Import your GitHub repository.
+3. **Configure Project Settings**:
+   - **Framework Preset**: `Other` (or leave as auto-detected).
+   - **Build Command**: `npm run build` (runs `build.sh` to install Flutter and compile the web assets).
+   - **Output Directory**: `frontend/build/web` (points Vercel to the static Flutter Web build output).
+   - **Root Directory**: `.` (leave as root).
+4. **Configure Environment Variables**:
+   - In the project settings, add:
+     - `GEMINI_API_KEY`: Your Google Gemini API Key.
+5. **Deploy**:
+   - Click **Deploy**. Vercel will build both the Flutter Web frontend and deploy the FastAPI backend as serverless functions.
+
