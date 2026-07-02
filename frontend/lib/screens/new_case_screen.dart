@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
@@ -311,63 +312,65 @@ class _NewCaseScreenState extends State<NewCaseScreen> {
   }
 
   Widget _buildProcessingView() {
-    return Center(
+    return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Sleek glowing loader
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 120,
-                height: 120,
-                child: CircularProgressIndicator(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Sleek glowing loader
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: CircularProgressIndicator(
+                    value: _processingProgress,
+                    strokeWidth: 8,
+                    backgroundColor: AppTheme.surface,
+                    color: AppTheme.accent,
+                  ),
+                ),
+                const Icon(Icons.psychology, size: 48, color: AppTheme.accent),
+              ],
+            ),
+            const SizedBox(height: 48),
+            
+            Text(
+              "PoliceMind AI Active",
+              style: GoogleFonts.outfit(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            Text(
+              _processingStep,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 40),
+            
+            // Progress bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: SizedBox(
+                width: 200,
+                child: LinearProgressIndicator(
                   value: _processingProgress,
-                  strokeWidth: 8,
                   backgroundColor: AppTheme.surface,
                   color: AppTheme.accent,
+                  minHeight: 6,
                 ),
               ),
-              const Icon(Icons.psychology, size: 48, color: AppTheme.accent),
-            ],
-          ),
-          const SizedBox(height: 48),
-          
-          Text(
-            "PoliceMind AI Active",
-            style: GoogleFonts.outfit(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-          const SizedBox(height: 8),
-          
-          Text(
-            _processingStep,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 40),
-          
-          // Progress bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: SizedBox(
-              width: 200,
-              child: LinearProgressIndicator(
-                value: _processingProgress,
-                backgroundColor: AppTheme.surface,
-                color: AppTheme.accent,
-                minHeight: 6,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
