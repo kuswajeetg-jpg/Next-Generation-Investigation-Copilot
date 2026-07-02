@@ -26296,7 +26296,7 @@ this.b=b},
 aqO:function aqO(a){this.a=a},
 o0(){var s=$.axK
 if(s!=null&&s.length!==0)return s
-return"https://policemind-backend.onrender.com"},
+return"https://next-generation-investigation-copilot.vercel.app"},
 ru:function ru(){},
 Zf:function Zf(){},
 Zc:function Zc(){},
