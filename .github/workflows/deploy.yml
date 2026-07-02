@@ -39,9 +39,8 @@ jobs:
       - name: Build Web App
         run: |
           cd frontend
-          # Compile the web build and inject the backend URL
-          # Replace 'https://policemind-backend.onrender.com' with your actual deployed Render backend URL
-          flutter build web --release --dart-define=BACKEND_URL=https://policemind-backend.onrender.com
+          # Compile the web build, inject backend URL and configure subfolder hosting path
+          flutter build web --release --base-href "/Next-Generation-Investigation-Copilot/" --dart-define=BACKEND_URL=https://policemind-backend.onrender.com
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
